@@ -424,6 +424,8 @@ const TYPES = {
 };
 
 const DEFAULT = {
+  title: '鹿児島・熊本の旅 ✈',
+  dateRange: '10月15日（木）〜 19日（月）',
   days: [
     {
       id: 'day1', date: '10月15日（木）', label: 'Day 1', theme: '✈ 出発',
@@ -491,6 +493,8 @@ let editPhotos = [];
 function save() { localStorage.setItem('travel_app_v1', JSON.stringify(data)); }
 
 function render() {
+  document.getElementById('headerTitle').textContent = data.title || '鹿児島・熊本の旅 ✈';
+  document.getElementById('headerDates').textContent = data.dateRange || '10月15日（木）〜 19日（月）';
   renderTabs();
   renderDay();
 }
