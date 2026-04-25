@@ -293,7 +293,7 @@
       <button class="header-btn" onclick="openShareModal()">📤 共有</button>
     </div>
     <div class="header-sub">SISTERS TRIP 2025</div>
-    <div class="header-title" id="headerTitle">鹿児島・熊本の旅 ✈</div>
+    <div class="header-title" id="headerTitle">人吉と有田焼お散歩</div>
     <div class="header-dates" id="headerDates">10月15日（木）〜 19日（月）</div>
   </div>
 
@@ -424,7 +424,7 @@ const TYPES = {
 };
 
 const DEFAULT = {
-  title: '鹿児島・熊本の旅 ✈',
+  title: '人吉と有田焼お散歩',
   dateRange: '10月15日（木）〜 19日（月）',
   days: [
     {
@@ -452,7 +452,7 @@ const DEFAULT = {
       id: 'day3', date: '10月17日（土）', label: 'Day 3', theme: '🎨 有田・温泉',
       events: [
         { id: 'd3e1', time: '午前', type: 'car', title: '人吉 → 有田（佐賀）', detail: 'よっちゃんの軽自動車で出発\nなおみ・よっちゃん・お母さん 3人旅', note: '' },
-        { id: 'd3e2', time: '午前〜昼', type: 'activity', title: '秋の有田陶磁器まつり & 有田焼体験', detail: '佐賀県有田町\n🎨 秋の有田陶磁器まつり開催中（10/4〜12/7）\n窯元めぐり・絵付け体験・着物体験など\n⚠️ メインの陶器市は11/20〜24\n　 10/17は窯元・体験イベント期間です\n※体験は予約が必要な場合あり', note: '', refImage: 'arita_poster', refLink: 'https://www.arita.jp/event/toujikimatsuri/' },
+        { id: 'd3e2', time: '午前〜昼', type: 'activity', title: '秋の有田陶磁器まつり', detail: '佐賀県有田町\n🎨 秋の有田陶磁器まつり開催中（10/4〜12/7）\n窯元めぐり・お買い物・着物体験など\n⚠️ メインの陶器市は11/20〜24\n　 10/17は窯元めぐり期間です', note: '', refImage: 'arita_poster', refLink: 'https://www.arita.jp/event/toujikimatsuri/' },
         { id: 'd3e3', time: '午後', type: 'car', title: '有田 → 別府（大分）', detail: 'よっちゃんの車で移動\n所要時間：約2時間', note: '' },
         { id: 'd3e4', time: '夕方', type: 'hotel', title: '大江戸温泉物語 別府清風 チェックイン', detail: '大江戸温泉物語 別府清風（大分県別府市）\n別府温泉・海が見える露天風呂 ♨\n料金：1名 11,500円〜\n公式：ooedoonsen.jp/beppu/', note: '' },
         { id: 'd3e5', time: '夜', type: 'relax', title: '温泉でゆっくり', detail: '別府温泉を満喫♨\n海を眺めながら露天風呂', note: '' }
@@ -483,14 +483,14 @@ const DEFAULT = {
   ]
 };
 
-let data = migrateData(JSON.parse(localStorage.getItem('travel_app_v1') || 'null') || JSON.parse(JSON.stringify(DEFAULT)));
+let data = migrateData(JSON.parse(localStorage.getItem('travel_app_v3') || 'null') || JSON.parse(JSON.stringify(DEFAULT)));
 let curDay = 0;
 let editDayId = null;
 let editEvId = null;
 let isAdding = false;
 let editPhotos = [];
 
-function save() { localStorage.setItem('travel_app_v1', JSON.stringify(data)); }
+function save() { localStorage.setItem('travel_app_v3', JSON.stringify(data)); }
 
 function render() {
   document.getElementById('headerTitle').textContent = data.title || '鹿児島・熊本の旅 ✈';
