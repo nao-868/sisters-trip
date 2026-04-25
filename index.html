@@ -228,6 +228,16 @@
     .empty { text-align: center; padding: 40px 20px; color: var(--text-light); }
     .empty-icon { font-size: 44px; margin-bottom: 10px; }
 
+    /* REF IMAGE */
+    .ev-ref-img {
+      width: 100%; border-radius: 10px; margin-top: 8px;
+      display: block; max-height: 200px; object-fit: cover; cursor: pointer;
+    }
+    .ev-ref-link {
+      display: inline-block; font-size: 11px; color: var(--primary);
+      margin-top: 5px; text-decoration: none;
+    }
+
     /* PHOTOS */
     .ev-photos { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
     .ev-photo {
@@ -410,16 +420,18 @@ const DEFAULT = {
       id: 'day3', date: '10月17日（土）', label: 'Day 3', theme: '🎨 有田・温泉',
       events: [
         { id: 'd3e1', time: '午前', type: 'car', title: '人吉 → 有田（佐賀）', detail: 'よっちゃんの軽自動車で出発\nなおみ・よっちゃん・お母さん 3人旅', note: '' },
-        { id: 'd3e2', time: '午前〜昼', type: 'activity', title: '有田焼 体験', detail: '佐賀県有田町\n有田焼の絵付け体験など\n※予約が必要な場合は事前確認を', note: '' },
-        { id: 'd3e3', time: '午後', type: 'hotel', title: '大江戸温泉物語 チェックイン', detail: '大江戸温泉物語（佐賀）\n※施設詳細・場所は要確認', note: '' },
-        { id: 'd3e4', time: '夕方〜', type: 'relax', title: '温泉 & ぶらぶら観光', detail: '温泉でゆっくり♨\n周辺を散策', note: '' }
+        { id: 'd3e2', time: '午前〜昼', type: 'activity', title: '秋の有田陶磁器まつり & 有田焼体験', detail: '佐賀県有田町\n🎨 秋の有田陶磁器まつり開催中（10/4〜12/7）\n窯元めぐり・絵付け体験・着物体験など\n⚠️ メインの陶器市は11/20〜24\n　 10/17は窯元・体験イベント期間です\n※体験は予約が必要な場合あり', note: '', refImage: 'https://www.arita.jp/news/upload/bbafcf941eceee559b3761aa08be81fbe3a41f0d.jpg', refLink: 'https://www.arita.jp/event/toujikimatsuri/' },
+        { id: 'd3e3', time: '午後', type: 'car', title: '有田 → 別府（大分）', detail: 'よっちゃんの車で移動\n所要時間：約2時間', note: '' },
+        { id: 'd3e4', time: '夕方', type: 'hotel', title: '大江戸温泉物語 別府清風 チェックイン', detail: '大江戸温泉物語 別府清風（大分県別府市）\n別府温泉・海が見える露天風呂 ♨\n料金：1名 11,500円〜\n公式：ooedoonsen.jp/beppu/', note: '' },
+        { id: 'd3e5', time: '夜', type: 'relax', title: '温泉でゆっくり', detail: '別府温泉を満喫♨\n海を眺めながら露天風呂', note: '' }
       ]
     },
     {
       id: 'day4', date: '10月18日（日）', label: 'Day 4', theme: '🗺 観光 & 帰宅',
       events: [
-        { id: 'd4e1', time: '午前〜昼', type: 'activity', title: 'ぶらぶら観光', detail: '周辺をのんびり観光', note: '' },
-        { id: 'd4e2', time: '夕方', type: 'car', title: '人吉の実家へ', detail: '熊本県人吉市浪床町\nよっちゃんの車で帰宅', note: '' }
+        { id: 'd4e1', time: '午前', type: 'activity', title: '別府観光', detail: '別府地獄めぐりなど\nぶらぶら観光 🌋', note: '' },
+        { id: 'd4e2', time: '昼', type: 'food', title: '別府でランチ', detail: '別府グルメを楽しむ🍜', note: '' },
+        { id: 'd4e3', time: '午後', type: 'car', title: '別府 → 人吉の実家へ', detail: '熊本県人吉市浪床町\nよっちゃんの車で帰宅\n所要時間：約2.5時間', note: '' }
       ]
     },
     {
@@ -535,6 +547,8 @@ function renderEv(ev, dayId) {
         <button class="ev-edit" onclick="stopProp(event);openEdit('${dayId}','${ev.id}')">✏️</button>
       </div>
       ${ev.detail ? `<div class="ev-detail">${h(ev.detail)}</div>` : ''}
+      ${ev.refImage ? `<img class="ev-ref-img" src="${ev.refImage}" onclick="stopProp(event);openImgViewer('${ev.refImage}')" onerror="this.style.display='none'">` : ''}
+      ${ev.refLink ? `<a class="ev-ref-link" href="${ev.refLink}" target="_blank" onclick="stopProp(event)">🔗 公式サイトを見る</a>` : ''}
       ${ev.note ? `<div class="ev-note">${h(ev.note)}</div>` : ''}
       ${ev.photos && ev.photos.length ? `<div class="ev-photos">${ev.photos.map((p,i) => `<img class="ev-photo" src="${p}" onclick="stopProp(event);openViewer('${dayId}','${ev.id}',${i})">`).join('')}</div>` : ''}
     `;
@@ -670,6 +684,11 @@ function openViewer(dayId, evId, idx) {
 
 function closeViewer() {
   document.getElementById('viewerOverlay').classList.remove('open');
+}
+
+function openImgViewer(src) {
+  document.getElementById('viewerImg').src = src;
+  document.getElementById('viewerOverlay').classList.add('open');
 }
 
 function saveEv() {
