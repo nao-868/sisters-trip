@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>姉妹旅行 鹿児島・熊本 2025</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #2A9D8F;
+      --primary-dark: #1f7568;
+      --secondary: #E76F51;
+      --bg: #EEF2F0;
+      --white: #FFFFFF;
+      --text-dark: #1a2332;
+      --text-mid: #4A5568;
+      --text-light: #A0AEC0;
+      --border: #E2E8F0;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.09);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      -webkit-font-smoothing: antialiased;
+    }
+    #app { max-width: 430px; margin: 0 auto; min-height: 100vh; }
+
+    /* HEADER */
+    .app-header {
+      background: linear-gradient(135deg, #264653 0%, #2A9D8F 100%);
+      color: white;
+      padding: 52px 20px 18px;
+      position: relative;
+    }
+    .header-sub { font-size: 11px; letter-spacing: 2px; opacity: 0.65; margin-bottom: 3px; }
+    .header-title { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+    .header-dates { font-size: 12px; opacity: 0.78; }
+    .header-btn {
+      position: absolute; top: 14px; right: 16px;
+      background: rgba(255,255,255,0.22); border: none; border-radius: 20px;
+      color: white; padding: 6px 14px; font-size: 12px; cursor: pointer;
+    }
+
+    /* DAY TABS */
+    .tabs-wrap {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+    .tabs { display: flex; overflow-x: auto; scrollbar-width: none; padding: 0 6px; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex-shrink: 0; padding: 11px 14px; border: none; background: none;
+      cursor: pointer; font-size: 11px; color: var(--text-light);
+      border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.2s;
+      font-family: inherit;
+    }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+    .tab-date { display: block; font-size: 9px; opacity: 0.7; margin-top: 1px; }
+
+    /* MAIN */
+    .main { padding: 16px; padding-bottom: 90px; }
+
+    /* DAY HEADER */
+    .day-hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .day-num {
+      width: 46px; height: 46px; background: var(--primary); color: white;
+      border-radius: 12px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .day-num-n { font-size: 18px; font-weight: 800; line-height: 1; }
+    .day-num-l { font-size: 9px; opacity: 0.75; }
+    .day-hdr-info h2 { font-size: 15px; font-weight: 700; }
+    .day-theme { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+    /* TIMELINE */
+    .timeline { position: relative; padding-left: 22px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 6px; top: 18px; bottom: 18px;
+      width: 2px; background: linear-gradient(to bottom, var(--primary), #cde8e5);
+      border-radius: 2px;
+    }
+
+    /* EVENT ITEM */
+    .ev-item { position: relative; margin-bottom: 10px; }
+    .ev-dot {
+      position: absolute; left: -20px; top: 16px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: white; border: 2.5px solid var(--primary); z-index: 1;
+    }
+    .ev-dot.flight { background: #3a7bd5; border-color: #3a7bd5; }
+    .ev-dot.walk   { border-color: #48bb78; }
+    .ev-dot.train  { border-color: #4299e1; }
+    .ev-dot.car    { border-color: #9f7aea; }
+    .ev-dot.bus    { border-color: #f6ad55; }
+    .ev-dot.food   { border-color: #fc8181; }
+    .ev-dot.hotel  { border-color: #b794f4; }
+    .ev-dot.activity { border-color: #2A9D8F; }
+    .ev-dot.arrive { border-color: #48bb78; }
+
+    /* EVENT CARD */
+    .ev-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 13px 14px; box-shadow: var(--shadow-sm);
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: transform 0.12s;
+    }
+    .ev-card:active { transform: scale(0.98); }
+    .ev-card-row { display: flex; align-items: flex-start; gap: 10px; }
+    .ev-icon { font-size: 22px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+    .ev-info { flex: 1; min-width: 0; }
+    .ev-time { font-size: 10px; color: var(--text-light); margin-bottom: 1px; }
+    .ev-title { font-size: 14px; font-weight: 600; }
+    .ev-detail {
+      font-size: 12px; color: var(--text-mid); line-height: 1.65;
+      margin-top: 6px; white-space: pre-wrap;
+    }
+    .ev-note {
+      font-size: 11px; color: var(--secondary); margin-top: 6px;
+      padding: 5px 9px; background: rgba(231,111,81,0.08);
+      border-radius: 7px; border-left: 3px solid var(--secondary);
+    }
+    .ev-edit {
+      position: absolute; top: 9px; right: 9px;
+      background: rgba(0,0,0,0.05); border: none; border-radius: 50%;
+      width: 26px; height: 26px; cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center; color: var(--text-light);
+    }
+
+    /* FLIGHT CARD */
+    .ev-card.flight {
+      background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+      color: white;
+    }
+    .ev-card.flight .ev-time,
+    .ev-card.flight .ev-detail { color: rgba(255,255,255,0.85); }
+    .ev-card.flight .ev-title { color: white; }
+    .ev-card.flight .ev-edit { background: rgba(255,255,255,0.2); color: white; }
+    .flight-route {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 10px; padding: 8px 10px;
+      background: rgba(255,255,255,0.15); border-radius: 10px;
+    }
+    .fl-ap { text-align: center; }
+    .fl-code { font-size: 20px; font-weight: 800; line-height: 1; }
+    .fl-time { font-size: 14px; font-weight: 600; margin-top: 2px; }
+    .fl-city { font-size: 9px; opacity: 0.75; }
+    .fl-mid { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .fl-line { width: 100%; height: 1px; background: rgba(255,255,255,0.5); position: relative; }
+    .fl-line::after { content: '✈'; position: absolute; right: -5px; top: -8px; font-size: 13px; }
+    .fl-airline { font-size: 9px; opacity: 0.75; text-align: center; }
+
+    /* BACKUP */
+    .backup-card {
+      margin-top: 7px; border-radius: 10px; overflow: hidden;
+      border: 1.5px dashed #f6ad55;
+    }
+    .backup-hdr {
+      background: rgba(246,173,85,0.1); padding: 8px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer;
+    }
+    .backup-hdr-title { font-size: 12px; font-weight: 600; color: #b7791f; }
+    .backup-toggle { font-size: 10px; color: #b7791f; }
+    .backup-body {
+      background: white; padding: 10px 12px;
+      font-size: 12px; color: var(--text-mid); line-height: 1.65;
+      white-space: pre-wrap; display: none;
+    }
+    .backup-body.open { display: block; }
+
+    /* FAB */
+    .fab {
+      position: fixed; bottom: 22px; right: 16px;
+      width: 54px; height: 54px; background: var(--primary); color: white;
+      border: none; border-radius: 50%; font-size: 28px; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(42,157,143,0.45);
+      display: flex; align-items: center; justify-content: center; z-index: 100;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.48);
+      z-index: 200; display: none; align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 22px 22px 0 0;
+      width: 100%; max-width: 430px; max-height: 92vh;
+      overflow-y: auto; padding: 20px 18px 44px;
+      animation: slideUp 0.28s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-handle { width: 38px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+    .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+
+    /* FORM */
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--text-mid); margin-bottom: 5px; letter-spacing: 0.4px; text-transform: uppercase; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; padding: 11px 13px; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 14px; font-family: inherit;
+      color: var(--text-dark); background: var(--bg); outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .modal-btns { display: flex; gap: 9px; margin-top: 22px; }
+    .btn { padding: 13px; border-radius: var(--radius-sm); border: none; font-size: 14px; font-weight: 600; cursor: pointer; flex: 1; font-family: inherit; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-danger { background: #FED7D7; color: #C53030; }
+    .btn-ghost { background: var(--bg); color: var(--text-mid); }
+
+    /* SHARE */
+    .share-sec { background: var(--bg); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+    .share-sec-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .share-hint { font-size: 11px; color: var(--text-light); margin-top: 6px; }
+    .import-ta {
+      width: 100%; height: 90px; padding: 9px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 11px; font-family: monospace; resize: none;
+    }
+
+    /* EMPTY */
+    .empty { text-align: center; padding: 40px 20px; color: var(--text-light); }
+    .empty-icon { font-size: 44px; margin-bottom: 10px; }
+
+    /* PHOTOS */
+    .ev-photos { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .ev-photo {
+      width: 80px; height: 80px; object-fit: cover;
+      border-radius: 10px; cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .ev-photo:active { opacity: 0.75; }
+    .ev-card.flight .ev-photos .ev-photo { border: 1.5px solid rgba(255,255,255,0.3); }
+
+    /* PHOTO EDIT AREA */
+    .photo-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .photo-thumb-wrap { position: relative; }
+    .photo-thumb { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; }
+    .photo-del {
+      position: absolute; top: -6px; right: -6px;
+      width: 20px; height: 20px; background: #C53030; color: white;
+      border: none; border-radius: 50%; font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; line-height: 1;
+    }
+    .photo-add-btn {
+      width: 72px; height: 72px; border: 2px dashed var(--border);
+      border-radius: 8px; background: var(--bg); cursor: pointer;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; font-size: 22px; color: var(--text-light);
+      gap: 2px;
+    }
+    .photo-add-btn span { font-size: 10px; }
+
+    /* PHOTO VIEWER */
+    .viewer-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+      z-index: 300; display: none; align-items: center; justify-content: center;
+    }
+    .viewer-overlay.open { display: flex; }
+    .viewer-img { max-width: 95vw; max-height: 90vh; border-radius: 8px; object-fit: contain; }
+    .viewer-close {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,0.15); border: none; color: white;
+      width: 36px; height: 36px; border-radius: 50%; font-size: 18px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="app-header">
+    <button class="header-btn" onclick="openShareModal()">📤 共有</button>
+    <div class="header-sub">SISTERS TRIP 2025</div>
+    <div class="header-title">鹿児島・熊本の旅 ✈</div>
+    <div class="header-dates">10月15日（木）〜 19日（月）</div>
+  </div>
+
+  <div class="tabs-wrap">
+    <div class="tabs" id="tabs"></div>
+  </div>
+
+  <div class="main" id="main"></div>
+
+  <button class="fab" onclick="openAddModal()">＋</button>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="editTitle">予定を編集</div>
+    <div class="form-group">
+      <label class="form-label">時間</label>
+      <input type="text" class="form-input" id="fTime" placeholder="例：11:45　午前　終日">
+    </div>
+    <div class="form-group">
+      <label class="form-label">種類</label>
+      <select class="form-select" id="fType">
+        <option value="flight">✈ フライト</option>
+        <option value="train">🚃 電車</option>
+        <option value="car">🚗 車</option>
+        <option value="bus">🚌 バス</option>
+        <option value="walk">🚶 徒歩</option>
+        <option value="food">🍽 食事</option>
+        <option value="hotel">🏨 宿泊</option>
+        <option value="activity">🎨 観光・体験</option>
+        <option value="relax">😊 のんびり</option>
+        <option value="arrive">📍 到着</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">タイトル</label>
+      <input type="text" class="form-input" id="fTitleInput" placeholder="予定のタイトル">
+    </div>
+    <div class="form-group">
+      <label class="form-label">詳細</label>
+      <textarea class="form-textarea" id="fDetail" placeholder="詳細（改行OK）"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">メモ</label>
+      <textarea class="form-textarea" id="fNote" placeholder="メモ・備考" style="min-height:58px"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">写真</label>
+      <div class="photo-grid" id="photoGrid"></div>
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="onPhotoSelect(event)">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">キャンセル</button>
+      <button class="btn btn-danger" id="delBtn" onclick="deleteEv()">削除</button>
+      <button class="btn btn-primary" onclick="saveEv()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Photo Viewer -->
+<div class="viewer-overlay" id="viewerOverlay" onclick="closeViewer()">
+  <button class="viewer-close" onclick="closeViewer()">✕</button>
+  <img class="viewer-img" id="viewerImg" src="" alt="">
+</div>
+
+<!-- Share Modal -->
+<div class="modal-overlay" id="shareModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">データを共有 📤</div>
+    <p style="font-size:12px;color:var(--text-mid);margin-bottom:14px;line-height:1.7;">
+      コピーしたデータをLINEで妹に送れば、同じ旅程を共有できます。
+    </p>
+    <div class="share-sec">
+      <div class="share-sec-title">① データをコピーして送る</div>
+      <button class="btn btn-primary" onclick="exportData()" style="margin-bottom:6px;">データをコピー 📋</button>
+      <div class="share-hint">LINEやメールで妹に送ってね</div>
+    </div>
+    <div class="share-sec">
+      <div class="share-sec-title">② 受け取ったデータを読み込む</div>
+      <textarea class="import-ta" id="importTa" placeholder="受け取ったデータをここに貼り付け"></textarea>
+      <button class="btn btn-primary" onclick="importData()" style="margin-top:9px;">読み込む ✅</button>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeModal('shareModal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TYPES = {
+  flight:   { icon: '✈️',  label: 'フライト' },
+  train:    { icon: '🚃',  label: '電車' },
+  car:      { icon: '🚗',  label: '車' },
+  bus:      { icon: '🚌',  label: 'バス' },
+  walk:     { icon: '🚶',  label: '徒歩' },
+  food:     { icon: '🍽️', label: '食事' },
+  hotel:    { icon: '🏨',  label: '宿泊' },
+  activity: { icon: '🎨',  label: '観光' },
+  relax:    { icon: '😊',  label: 'のんびり' },
+  arrive:   { icon: '📍',  label: '到着' },
+};
+
+const DEFAULT = {
+  days: [
+    {
+      id: 'day1', date: '10月15日（木）', label: 'Day 1', theme: '✈ 出発',
+      events: [
+        { id: 'd1e1', time: '午前', type: 'walk', title: '自宅 → 津島駅', detail: '愛知県津島市古川町から徒歩', note: '' },
+        { id: 'd1e2', time: '午前', type: 'train', title: '津島駅 → セントレア', detail: '名鉄 津島線 → 名古屋 → 常滑線\n所要時間：約60〜70分', note: '' },
+        { id: 'd1e3', time: '〜11:30', type: 'food', title: 'セントレアでブランチ & お土産', detail: '中部国際空港（セントレア）\n出発前にゆっくりブランチ♪\nお土産ショッピングも忘れずに！', note: '' },
+        { id: 'd1e4', time: '11:45', type: 'flight', title: 'BC637 出発',
+          detail: 'スカイマーク BC637\n中部国際空港（NGO）→ 鹿児島空港（KOJ）\n11:45 → 13:05',
+          flightInfo: { from: 'NGO', to: 'KOJ', dep: '11:45', arr: '13:05', fromCity: '中部国際', toCity: '鹿児島', airline: 'スカイマーク BC637' },
+          note: '' },
+        { id: 'd1e5', time: '13:05', type: 'arrive', title: '鹿児島空港 到着',
+          detail: '🚗 両親がお迎え予定', note: '',
+          backup: { title: '🚌 バス（代替プラン）', detail: '鹿児島空港バスターミナル発\n南国交通・九州産交バス\n人吉・熊本方面行き\n※時刻は事前に要確認\n南国交通 www.nankobus.co.jp' } }
+      ]
+    },
+    {
+      id: 'day2', date: '10月16日（金）', label: 'Day 2', theme: '😊 のんびり',
+      events: [
+        { id: 'd2e1', time: '終日', type: 'relax', title: '実家でのんびり', detail: '熊本県人吉市浪床町\nのんびりゆっくり過ごす', note: '' }
+      ]
+    },
+    {
+      id: 'day3', date: '10月17日（土）', label: 'Day 3', theme: '🎨 有田・温泉',
+      events: [
+        { id: 'd3e1', time: '午前', type: 'car', title: '人吉 → 有田（佐賀）', detail: 'よっちゃんの軽自動車で出発\nなおみ・よっちゃん・お母さん 3人旅', note: '' },
+        { id: 'd3e2', time: '午前〜昼', type: 'activity', title: '有田焼 体験', detail: '佐賀県有田町\n有田焼の絵付け体験など\n※予約が必要な場合は事前確認を', note: '' },
+        { id: 'd3e3', time: '午後', type: 'hotel', title: '大江戸温泉物語 チェックイン', detail: '大江戸温泉物語（佐賀）\n※施設詳細・場所は要確認', note: '' },
+        { id: 'd3e4', time: '夕方〜', type: 'relax', title: '温泉 & ぶらぶら観光', detail: '温泉でゆっくり♨\n周辺を散策', note: '' }
+      ]
+    },
+    {
+      id: 'day4', date: '10月18日（日）', label: 'Day 4', theme: '🗺 観光 & 帰宅',
+      events: [
+        { id: 'd4e1', time: '午前〜昼', type: 'activity', title: 'ぶらぶら観光', detail: '周辺をのんびり観光', note: '' },
+        { id: 'd4e2', time: '夕方', type: 'car', title: '人吉の実家へ', detail: '熊本県人吉市浪床町\nよっちゃんの車で帰宅', note: '' }
+      ]
+    },
+    {
+      id: 'day5', date: '10月19日（月）', label: 'Day 5', theme: '✈ 帰宅',
+      events: [
+        { id: 'd5e1', time: '午前', type: 'car', title: '人吉 → 鹿児島空港',
+          detail: '🚗 両親の車で送ってもらう予定', note: '',
+          backup: { title: '🚌 バス（代替プラン）', detail: '人吉バスセンター発\n九州産交バス 鹿児島空港行き\n※時刻は事前に要確認\n九州産交 www.kyusanko.co.jp' } },
+        { id: 'd5e2', time: '〜13:00', type: 'food', title: '鹿児島空港でランチ', detail: '空港内レストランでランチ🍱\nお土産もチェック！', note: '' },
+        { id: 'd5e3', time: '13:30', type: 'flight', title: 'BC636 出発',
+          detail: 'スカイマーク BC636\n鹿児島空港（KOJ）→ 中部国際空港（NGO）\n13:30 → 14:50',
+          flightInfo: { from: 'KOJ', to: 'NGO', dep: '13:30', arr: '14:50', fromCity: '鹿児島', toCity: '中部国際', airline: 'スカイマーク BC636' },
+          note: '' },
+        { id: 'd5e4', time: '14:50', type: 'arrive', title: '中部国際空港 到着', detail: 'セントレア 到着！\nお疲れさまでした ✨', note: '' }
+      ]
+    }
+  ]
+};
+
+let data = JSON.parse(localStorage.getItem('travel_app_v1') || 'null') || JSON.parse(JSON.stringify(DEFAULT));
+let curDay = 0;
+let editDayId = null;
+let editEvId = null;
+let isAdding = false;
+let editPhotos = [];
+
+function save() { localStorage.setItem('travel_app_v1', JSON.stringify(data)); }
+
+function render() {
+  renderTabs();
+  renderDay();
+}
+
+function renderTabs() {
+  document.getElementById('tabs').innerHTML = data.days.map((d, i) => `
+    <button class="tab-btn ${i === curDay ? 'active' : ''}" onclick="selDay(${i})">
+      ${d.label}<span class="tab-date">${d.date}</span>
+    </button>
+  `).join('');
+}
+
+function renderDay() {
+  const day = data.days[curDay];
+  let html = `
+    <div class="day-hdr">
+      <div class="day-num">
+        <div class="day-num-n">${curDay + 1}</div>
+        <div class="day-num-l">DAY</div>
+      </div>
+      <div class="day-hdr-info">
+        <h2>${day.date}</h2>
+        <div class="day-theme">${day.theme}</div>
+      </div>
+    </div>
+    <div class="timeline">
+  `;
+  if (!day.events.length) {
+    html += `<div class="empty"><div class="empty-icon">📝</div><p>＋ボタンで予定を追加してね</p></div>`;
+  } else {
+    day.events.forEach(ev => { html += renderEv(ev, day.id); });
+  }
+  html += '</div>';
+  document.getElementById('main').innerHTML = html;
+}
+
+function h(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function renderEv(ev, dayId) {
+  const tc = TYPES[ev.type] || TYPES.relax;
+  const isFlight = ev.type === 'flight';
+
+  let inner = '';
+  if (isFlight && ev.flightInfo) {
+    const fi = ev.flightInfo;
+    inner = `
+      <div class="ev-card-row">
+        <div class="ev-icon">${tc.icon}</div>
+        <div class="ev-info">
+          <div class="ev-time">${h(ev.time)}</div>
+          <div class="ev-title">${h(ev.title)}</div>
+        </div>
+        <button class="ev-edit" onclick="stopProp(event);openEdit('${dayId}','${ev.id}')">✏️</button>
+      </div>
+      <div class="flight-route">
+        <div class="fl-ap">
+          <div class="fl-code">${h(fi.from)}</div>
+          <div class="fl-time">${h(fi.dep)}</div>
+          <div class="fl-city">${h(fi.fromCity)}</div>
+        </div>
+        <div class="fl-mid">
+          <div class="fl-line"></div>
+          <div class="fl-airline">${h(fi.airline)}</div>
+        </div>
+        <div class="fl-ap">
+          <div class="fl-code">${h(fi.to)}</div>
+          <div class="fl-time">${h(fi.arr)}</div>
+          <div class="fl-city">${h(fi.toCity)}</div>
+        </div>
+      </div>
+      ${ev.note ? `<div class="ev-note">${h(ev.note)}</div>` : ''}
+      ${ev.photos && ev.photos.length ? `<div class="ev-photos">${ev.photos.map((p,i) => `<img class="ev-photo" src="${p}" onclick="stopProp(event);openViewer('${dayId}','${ev.id}',${i})">`).join('')}</div>` : ''}
+    `;
+  } else {
+    inner = `
+      <div class="ev-card-row">
+        <div class="ev-icon">${tc.icon}</div>
+        <div class="ev-info">
+          <div class="ev-time">${h(ev.time)}</div>
+          <div class="ev-title">${h(ev.title)}</div>
+        </div>
+        <button class="ev-edit" onclick="stopProp(event);openEdit('${dayId}','${ev.id}')">✏️</button>
+      </div>
+      ${ev.detail ? `<div class="ev-detail">${h(ev.detail)}</div>` : ''}
+      ${ev.note ? `<div class="ev-note">${h(ev.note)}</div>` : ''}
+      ${ev.photos && ev.photos.length ? `<div class="ev-photos">${ev.photos.map((p,i) => `<img class="ev-photo" src="${p}" onclick="stopProp(event);openViewer('${dayId}','${ev.id}',${i})">`).join('')}</div>` : ''}
+    `;
+  }
+
+  let backupHtml = '';
+  if (ev.backup) {
+    const bid = 'bk_' + ev.id;
+    backupHtml = `
+      <div class="backup-card">
+        <div class="backup-hdr" onclick="toggleBackup('${bid}')">
+          <span class="backup-hdr-title">${h(ev.backup.title)}</span>
+          <span class="backup-toggle" id="${bid}_t">▼ 詳細</span>
+        </div>
+        <div class="backup-body" id="${bid}">${h(ev.backup.detail)}</div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="ev-item">
+      <div class="ev-dot ${ev.type}"></div>
+      <div class="ev-card ${isFlight ? 'flight' : ''}" onclick="openEdit('${dayId}','${ev.id}')">
+        ${inner}
+      </div>
+      ${backupHtml}
+    </div>
+  `;
+}
+
+function stopProp(e) { e.stopPropagation(); }
+
+function selDay(i) {
+  curDay = i;
+  render();
+  window.scrollTo(0, 0);
+}
+
+function toggleBackup(id) {
+  const el = document.getElementById(id);
+  const t = document.getElementById(id + '_t');
+  const open = el.classList.toggle('open');
+  t.textContent = open ? '▲ 閉じる' : '▼ 詳細';
+}
+
+function openEdit(dayId, evId) {
+  const day = data.days.find(d => d.id === dayId);
+  const ev = day.events.find(e => e.id === evId);
+  editDayId = dayId; editEvId = evId; isAdding = false;
+  editPhotos = ev.photos ? [...ev.photos] : [];
+  document.getElementById('editTitle').textContent = '予定を編集';
+  document.getElementById('fTime').value = ev.time || '';
+  document.getElementById('fType').value = ev.type || 'activity';
+  document.getElementById('fTitleInput').value = ev.title || '';
+  document.getElementById('fDetail').value = ev.detail || '';
+  document.getElementById('fNote').value = ev.note || '';
+  document.getElementById('delBtn').style.display = '';
+  renderPhotoGrid();
+  openModal('editModal');
+}
+
+function openAddModal() {
+  editDayId = data.days[curDay].id; editEvId = null; isAdding = true;
+  editPhotos = [];
+  document.getElementById('editTitle').textContent = '予定を追加';
+  document.getElementById('fTime').value = '';
+  document.getElementById('fType').value = 'activity';
+  document.getElementById('fTitleInput').value = '';
+  document.getElementById('fDetail').value = '';
+  document.getElementById('fNote').value = '';
+  document.getElementById('delBtn').style.display = 'none';
+  renderPhotoGrid();
+  openModal('editModal');
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photoGrid');
+  grid.innerHTML = editPhotos.map((p, i) => `
+    <div class="photo-thumb-wrap">
+      <img class="photo-thumb" src="${p}">
+      <button class="photo-del" onclick="removePhoto(${i})">✕</button>
+    </div>
+  `).join('') + `
+    <button class="photo-add-btn" onclick="document.getElementById('photoInput').click()">
+      📷<span>追加</span>
+    </button>
+  `;
+}
+
+function removePhoto(i) {
+  editPhotos.splice(i, 1);
+  renderPhotoGrid();
+}
+
+function onPhotoSelect(e) {
+  const files = Array.from(e.target.files);
+  e.target.value = '';
+  Promise.all(files.map(compressImage)).then(results => {
+    editPhotos.push(...results);
+    renderPhotoGrid();
+  });
+}
+
+function compressImage(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 900;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function openViewer(dayId, evId, idx) {
+  const day = data.days.find(d => d.id === dayId);
+  const ev = day.events.find(e => e.id === evId);
+  document.getElementById('viewerImg').src = ev.photos[idx];
+  document.getElementById('viewerOverlay').classList.add('open');
+}
+
+function closeViewer() {
+  document.getElementById('viewerOverlay').classList.remove('open');
+}
+
+function saveEv() {
+  const title = document.getElementById('fTitleInput').value.trim();
+  if (!title) { alert('タイトルを入力してください'); return; }
+  const obj = {
+    time: document.getElementById('fTime').value.trim(),
+    type: document.getElementById('fType').value,
+    title,
+    detail: document.getElementById('fDetail').value.trim(),
+    note: document.getElementById('fNote').value.trim(),
+    photos: [...editPhotos],
+  };
+  const day = data.days.find(d => d.id === editDayId);
+  if (isAdding) {
+    day.events.push({ id: 'e_' + Date.now(), ...obj });
+  } else {
+    const ev = day.events.find(e => e.id === editEvId);
+    Object.assign(ev, obj);
+  }
+  save(); closeModal('editModal'); render();
+}
+
+function deleteEv() {
+  if (!confirm('この予定を削除しますか？')) return;
+  const day = data.days.find(d => d.id === editDayId);
+  day.events = day.events.filter(e => e.id !== editEvId);
+  save(); closeModal('editModal'); render();
+}
+
+function openShareModal() {
+  document.getElementById('importTa').value = '';
+  openModal('shareModal');
+}
+
+function exportData() {
+  const json = JSON.stringify(data);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(json).then(() => alert('コピーしました！\nLINEで妹に送ってね 📤'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = json; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('コピーしました！');
+  }
+}
+
+function importData() {
+  const json = document.getElementById('importTa').value.trim();
+  if (!json) { alert('データを貼り付けてください'); return; }
+  try {
+    const d = JSON.parse(json);
+    if (!d.days) throw new Error();
+    if (confirm('読み込みます。現在のデータは上書きされます。よろしいですか？')) {
+      data = d; save(); curDay = 0; closeModal('shareModal'); render();
+      alert('読み込みました ✅');
+    }
+  } catch { alert('データの形式が正しくありません'); }
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+});
+
+render();
+</script>
+</body>
+</html>
